@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OldFone — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0e1a0f;--paper:#f5f0e8;--leaf:#2d6a35;--leaf-light:#4a9955;--leaf-pale:#e8f2e9;--gold:#c8923a;--gold-pale:#fdf3e3;--muted:#6b7c6e;--border:#d4cfc4;--white:#ffffff;--danger:#c0392b;--danger-pale:#fdecea}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Familjen Grotesk',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+.topbar{background:var(--ink);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:1.1rem;font-weight:700;color:#fff}.logo span{color:#4a9955}
+.admin-label{font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#4a9955;background:rgba(74,153,85,0.15);padding:4px 12px;border-radius:100px;border:1px solid rgba(74,153,85,0.3)}
+.logout-btn{background:transparent;border:none;color:#6b7c6e;font-family:inherit;font-size:0.8rem;cursor:pointer}
+.logout-btn:hover{color:#fff}
+
+.main{max-width:1000px;margin:0 auto;padding:28px 16px 60px}
+.page-title{font-size:1.6rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px}
+.page-sub{font-size:0.83rem;color:var(--muted);margin-bottom:28px}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:18px 16px}
+.stat-label{font-size:0.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.stat-val{font-family:'Spline Sans Mono',monospace;font-size:1.8rem;font-weight:500;color:var(--ink)}
+.stat-val.green{color:var(--leaf)}
+
+/* SECTION */
+.section-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:22px;margin-bottom:20px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-size:1rem;font-weight:700;color:var(--ink)}
+.refresh-btn{background:transparent;border:1.5px solid var(--border);color:var(--muted);font-family:inherit;font-size:0.75rem;padding:5px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s}
+.refresh-btn:hover{border-color:var(--leaf);color:var(--leaf)}
+
+/* PAYMENT ROWS */
+.pay-row{border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;transition:border-color 0.2s}
+.pay-row:hover{border-color:#b8d8bb}
+.pay-email{font-size:0.85rem;font-weight:700;color:var(--ink)}
+.pay-detail{font-size:0.77rem;color:var(--muted);margin-top:3px;line-height:1.6}
+.pay-ref{font-family:'Spline Sans Mono',monospace;font-size:0.72rem;color:var(--gold);background:var(--gold-pale);padding:2px 8px;border-radius:6px;display:inline-block;margin-top:4px}
+.pay-amount{font-family:'Spline Sans Mono',monospace;font-size:1rem;font-weight:500;color:var(--leaf)}
+.action-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.btn-confirm{background:var(--leaf);color:#fff;font-family:inherit;font-size:0.78rem;font-weight:700;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s}
+.btn-confirm:hover{background:var(--leaf-light)}
+.btn-reject{background:transparent;color:var(--danger);font-family:inherit;font-size:0.78rem;font-weight:600;padding:7px 14px;border-radius:8px;border:1.5px solid #f5c6c2;cursor:pointer;transition:all 0.2s}
+.btn-reject:hover{background:var(--danger-pale)}
+
+/* USER TABLE */
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+th{text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.3px;border-bottom:1.5px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--ink)}
+tr:hover td{background:var(--paper)}
+.badge{display:inline-flex;padding:2px 10px;border-radius:100px;font-size:0.68rem;font-weight:700}
+.badge-active{background:var(--leaf-pale);color:var(--leaf)}
+.badge-pending{background:var(--gold-pale);color:var(--gold)}
+.badge-suspended{background:var(--danger-pale);color:var(--danger)}
+.badge-pro{background:var(--leaf-pale);color:var(--leaf);border:1px solid #b8d8bb}
+.badge-free{background:#f0f0f0;color:#777}
+
+.empty-state{text-align:center;padding:36px;color:var(--muted);font-size:0.85rem}
+.empty-icon{font-size:36px;margin-bottom:10px}
+
+/* notification toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-size:0.83rem;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:200;max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Old<span>Fone</span> <span style="margin-left:8px" class="admin-label">ADMIN</span></div>
+  <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+</div>
+
+<div class="main">
+  <div class="page-title">Admin Dashboard</div>
+  <div class="page-sub">Confirm payments manually. Manage users. Track revenue.</div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Users</div>
+      <div class="stat-val" id="s-users">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active Users</div>
+      <div class="stat-val green" id="s-active">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Payments Confirmed</div>
+      <div class="stat-val" id="s-payments">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Revenue</div>
+      <div class="stat-val green" id="s-revenue">—</div>
+    </div>
+  </div>
+
+  <!-- PENDING PAYMENTS -->
+  <div class="section-card">
+    <div class="sec-head">
+      <div class="sec-title">⏳ Pending Payments <span id="pending-count" style="font-size:0.78rem;color:var(--muted);font-weight:400"></span></div>
+      <button class="refresh-btn" onclick="loadPayments()">↻ Refresh</button>
+    </div>
+    <div id="payments-list">
+      <div class="empty-state"><div class="empty-icon">📭</div>Loading payments...</div>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div class="section-card">
+    <div class="sec-head">
+      <div class="sec-title">👥 All Users</div>
+      <button class="refresh-btn" onclick="loadUsers()">↻ Refresh</button>
+    </div>
+    <div id="users-table">
+      <div class="empty-state"><div class="empty-icon">⏳</div>Loading users...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+async function init() {
+  await Promise.all([loadStats(), loadPayments(), loadUsers()]);
+}
+
+async function loadStats() {
+  const r = await fetch('/api/admin/stats');
+  const d = await r.json();
+  if (!d.ok) return;
+  const s = d.stats;
+  document.getElementById('s-users').textContent = s.totalUsers;
+  document.getElementById('s-active').textContent = s.activeUsers;
+  document.getElementById('s-payments').textContent = s.confirmedPayments;
+  document.getElementById('s-revenue').textContent = Number(s.revenueUGX).toLocaleString() + ' UGX';
+}
+
+async function loadPayments() {
+  const r = await fetch('/api/admin/payments');
+  const d = await r.json();
+  const list = document.getElementById('payments-list');
+  const count = document.getElementById('pending-count');
+  if (!d.ok || !d.payments.length) {
+    count.textContent = '';
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>No pending payments — all clear!</div>';
+    return;
+  }
+  count.textContent = `(${d.payments.length})`;
+  list.innerHTML = d.payments.map(p => `
+    <div class="pay-row" id="pay-${p.id}">
+      <div>
+        <div class="pay-email">${p.email}</div>
+        <div class="pay-detail">
+          ${p.network.toUpperCase()} · ${p.momo_number} · ${p.momo_name || '—'}<br>
+          Plan: <strong>${p.plan}</strong> · Amount: <strong>${Number(p.amount).toLocaleString()} UGX</strong><br>
+          Submitted: ${new Date(p.created_at).toLocaleString('en-UG')}
+        </div>
+        <div class="pay-ref">REF: ${p.ref || 'NOT PROVIDED'}</div>
+        <div class="action-row">
+          <button class="btn-confirm" onclick="confirmPayment('${p.id}','${p.user_id}','${p.plan}')">✓ Confirm & Activate</button>
+          <button class="btn-reject" onclick="rejectPayment('${p.id}')">✗ Reject</button>
+        </div>
+      </div>
+      <div class="pay-amount">${Number(p.amount).toLocaleString()}<br><span style="font-size:0.7rem;color:var(--muted)">UGX</span></div>
+    </div>
+  `).join('');
+}
+
+async function confirmPayment(paymentId, userId, plan) {
+  if (!confirm('Confirm this payment and activate the user?')) return;
+  const r = await fetch('/api/admin/confirm-payment', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({payment_id: paymentId, user_id: userId, plan})
+  });
+  const d = await r.json();
+  if (d.ok) {
+    document.getElementById(`pay-${paymentId}`)?.remove();
+    toast('✅ Payment confirmed! User activated.');
+    loadStats();
+    loadUsers();
+  } else {
+    toast('❌ Error: ' + d.error);
+  }
+}
+
+async function rejectPayment(paymentId) {
+  if (!confirm('Reject this payment?')) return;
+  const r = await fetch('/api/admin/reject-payment', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({payment_id: paymentId})
+  });
+  const d = await r.json();
+  if (d.ok) {
+    document.getElementById(`pay-${paymentId}`)?.remove();
+    toast('Payment rejected.');
+  }
+}
+
+async function loadUsers() {
+  const r = await fetch('/api/admin/users');
+  const d = await r.json();
+  const area = document.getElementById('users-table');
+  if (!d.ok || !d.users.length) {
+    area.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div>No users yet</div>';
+    return;
+  }
+  area.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Email</th><th>Plan</th><th>Status</th><th>Joined</th>
+      </tr></thead>
+      <tbody>
+        ${d.users.map(u => `
+          <tr>
+            <td>${u.email}</td>
+            <td><span class="badge badge-${u.plan === 'pro' || u.plan === 'pro3' ? 'pro':'free'}">${u.plan.toUpperCase()}</span></td>
+            <td><span class="badge badge-${u.status}">${u.status}</span></td>
+            <td style="font-size:0.75rem;color:var(--muted)">${new Date(u.created_at).toLocaleDateString('en-UG')}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+async function doLogout() {
+  await fetch('/api/logout', {method:'POST'});
+  window.location.href = '/';
+}
+
+// Auto-refresh payments every 60 seconds
+setInterval(loadPayments, 60000);
+setInterval(loadStats, 60000);
+init();
+</script>
+</body>
+</html>

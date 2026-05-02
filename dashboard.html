@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>OldFone — My Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0e1a0f;--paper:#f5f0e8;--leaf:#2d6a35;--leaf-light:#4a9955;--leaf-pale:#e8f2e9;--gold:#c8923a;--gold-pale:#fdf3e3;--muted:#6b7c6e;--border:#d4cfc4;--white:#ffffff;--danger:#c0392b;--danger-pale:#fdecea}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Familjen Grotesk',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:var(--white);border-bottom:1.5px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{font-size:1.2rem;font-weight:700;color:var(--ink)}.logo span{color:var(--leaf)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.user-badge{font-size:0.78rem;color:var(--muted);background:var(--paper);padding:5px 12px;border-radius:100px;border:1.5px solid var(--border)}
+.plan-chip{font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:0.3px}
+.plan-free{background:#f0f0f0;color:#666}
+.plan-pro{background:var(--leaf-pale);color:var(--leaf);border:1px solid #b8d8bb}
+.logout-btn{background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:0.8rem;cursor:pointer;padding:5px 10px;border-radius:8px;transition:all 0.2s}
+.logout-btn:hover{color:var(--danger)}
+
+/* MAIN LAYOUT */
+.main{max-width:840px;margin:0 auto;padding:28px 16px 60px}
+
+/* STATUS CARD */
+.status-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.status-left{display:flex;align-items:center;gap:14px}
+.wa-avatar{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--leaf) 0%,#1a4d20 100%);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.wa-number{font-size:1rem;font-weight:700;color:var(--ink)}
+.wa-status{font-size:0.75rem;color:var(--muted);margin-top:2px}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.dot-green{background:var(--leaf);animation:blink 2s infinite}
+.dot-grey{background:#ccc}
+.dot-gold{background:var(--gold)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+.connect-btn{background:var(--leaf);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;padding:10px 20px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.connect-btn:hover{background:var(--leaf-light)}
+.connect-btn:disabled{opacity:0.6;cursor:not-allowed}
+
+/* SECTION CARD */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:22px;margin-bottom:20px}
+.card-title{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card-sub{font-size:0.8rem;color:var(--muted);margin-bottom:18px}
+
+/* QR */
+.qr-area{display:flex;flex-direction:column;align-items:center;padding:16px 0}
+.qr-img-box{width:180px;height:180px;border-radius:14px;border:2px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.qr-img-box img{width:100%;height:100%;object-fit:contain}
+.qr-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:0.75rem}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--leaf);border-radius:50%;animation:spin 0.9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.qr-hint{margin-top:12px;font-size:0.78rem;color:var(--muted);text-align:center;max-width:260px;line-height:1.5}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;gap:0}
+.chat-header-area{border-bottom:1.5px solid var(--border);padding-bottom:14px;margin-bottom:14px}
+.recipient-row{display:flex;gap:10px;align-items:center}
+.recipient-input{flex:1;background:var(--paper);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:0.88rem;color:var(--ink);font-family:inherit;outline:none;transition:border-color 0.2s}
+.recipient-input:focus{border-color:var(--leaf)}
+.messages-area{min-height:200px;max-height:300px;overflow-y:auto;padding:8px 0;display:flex;flex-direction:column;gap:8px;border:1.5px solid var(--border);border-radius:12px;padding:12px;background:var(--paper);margin-bottom:12px}
+.msg-bubble{max-width:80%;padding:9px 12px;border-radius:12px;font-size:0.85rem;line-height:1.5}
+.msg-out{background:var(--leaf);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg-in{background:var(--white);color:var(--ink);align-self:flex-start;border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg-time{font-size:0.6rem;opacity:0.6;margin-top:3px;text-align:right}
+.send-row{display:flex;gap:10px}
+.msg-input{flex:1;background:var(--paper);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-size:0.88rem;color:var(--ink);font-family:inherit;outline:none;transition:border-color 0.2s}
+.msg-input:focus{border-color:var(--leaf)}
+.send-btn{background:var(--leaf);color:#fff;border:none;border-radius:12px;padding:11px 18px;font-family:inherit;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.send-btn:hover{background:var(--leaf-light)}
+.send-btn:disabled{opacity:0.5;cursor:not-allowed}
+.empty-chat{text-align:center;color:var(--muted);font-size:0.8rem;padding:30px 0}
+
+/* PAYMENT */
+.pay-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.pay-step{background:var(--leaf-pale);border:1.5px solid #b8d8bb;border-radius:12px;padding:12px 14px;font-size:0.82rem;color:var(--ink);line-height:1.5}
+.pay-step strong{color:var(--leaf);font-family:'Spline Sans Mono',monospace}
+.field{margin-bottom:12px}
+.label{display:block;font-size:0.72rem;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px}
+.input{width:100%;background:var(--paper);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-size:0.88rem;color:var(--ink);font-family:inherit;outline:none;transition:border-color 0.2s}
+.input:focus{border-color:var(--leaf);box-shadow:0 0 0 3px rgba(45,106,53,0.08)}
+select.input{cursor:pointer}
+.submit-btn{width:100%;background:var(--leaf);color:#fff;font-family:inherit;font-weight:700;font-size:0.9rem;padding:13px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s}
+.submit-btn:hover{background:var(--leaf-light)}
+.submit-btn:disabled{opacity:0.6;cursor:not-allowed}
+.alert{border-radius:10px;padding:10px 13px;font-size:0.8rem;margin-bottom:12px;display:none}
+.alert-err{background:var(--danger-pale);border:1px solid #f5c6c2;color:var(--danger)}
+.alert-ok{background:var(--leaf-pale);border:1.5px solid #b8d8bb;color:var(--leaf)}
+
+/* payment status */
+.pay-status-card{border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;font-size:0.83rem;line-height:1.5;margin-bottom:20px}
+.pay-pending{background:var(--gold-pale);border:1.5px solid #e8c47a;color:#7d5a1e}
+.pay-active{background:var(--leaf-pale);border:1.5px solid #b8d8bb;color:var(--leaf)}
+.pay-status-icon{font-size:24px;flex-shrink:0}
+
+/* YOUR LINK */
+.link-box{background:var(--paper);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.link-url{font-family:'Spline Sans Mono',monospace;font-size:0.82rem;color:var(--leaf);word-break:break-all}
+.copy-btn{background:var(--leaf-pale);border:1.5px solid #b8d8bb;color:var(--leaf);font-family:inherit;font-size:0.75rem;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all 0.2s;border:none}
+.copy-btn:hover{background:var(--leaf);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">Old<span>Fone</span></div>
+  <div class="topbar-right">
+    <span class="user-badge" id="user-email">...</span>
+    <span class="plan-chip plan-free" id="plan-chip">free</span>
+    <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STATUS CARD -->
+  <div class="status-card">
+    <div class="status-left">
+      <div class="wa-avatar">📱</div>
+      <div>
+        <div class="wa-number" id="wa-number-display">Not connected</div>
+        <div class="wa-status" id="wa-status-text"><span class="status-dot dot-grey"></span>No WhatsApp session active</div>
+      </div>
+    </div>
+    <button class="connect-btn" id="connect-btn" onclick="startWA()">Connect WhatsApp</button>
+  </div>
+
+  <!-- PAYMENT STATUS (shown when pending or active) -->
+  <div id="pay-status-area"></div>
+
+  <!-- CONNECT SECTION - QR -->
+  <div class="card" id="qr-card" style="display:none">
+    <div class="card-title">📷 Scan QR Code</div>
+    <div class="card-sub">Open WhatsApp on your main phone → tap ⋮ → Linked Devices → Link a Device → scan this code</div>
+    <div class="qr-area">
+      <div class="qr-img-box" id="qr-box">
+        <div class="qr-placeholder">
+          <div class="spinner"></div>
+          <span>Generating QR...</span>
+        </div>
+      </div>
+      <div class="qr-hint" id="qr-hint">The QR code will appear here. Scan it once — you'll never need to scan again.</div>
+    </div>
+  </div>
+
+  <!-- CHAT SECTION -->
+  <div class="card" id="chat-card" style="display:none">
+    <div class="card-title">💬 Send a Message</div>
+    <div class="card-sub">Type a Uganda number (e.g. 0771234567) and send a WhatsApp message</div>
+    <div class="chat-wrap">
+      <div class="chat-header-area">
+        <div class="recipient-row">
+          <input class="recipient-input" id="chat-to" type="tel" placeholder="Phone number e.g. 0771234567">
+        </div>
+      </div>
+      <div class="messages-area" id="messages-area">
+        <div class="empty-chat">Your messages will appear here</div>
+      </div>
+      <div class="send-row">
+        <input class="msg-input" id="msg-input" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">Send ➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- YOUR LINK -->
+  <div class="card" id="link-card" style="display:none">
+    <div class="card-title">🔗 Your Personal Link</div>
+    <div class="card-sub">Bookmark this on your old phone's browser — opens your WhatsApp instantly, always</div>
+    <div class="link-box">
+      <div class="link-url" id="link-url">—</div>
+      <button class="copy-btn" onclick="copyLink()">Copy</button>
+    </div>
+  </div>
+
+  <!-- PAYMENT SECTION (shown when not active) -->
+  <div class="card" id="pay-card">
+    <div class="card-title">💳 Activate Your Account</div>
+    <div class="card-sub">Pay with MTN MoMo or Airtel Money to activate your session</div>
+
+    <div class="pay-steps">
+      <div class="pay-step">1. Send <strong>7,000 UGX</strong> to MTN MoMo: <strong id="mtn-number">0771 234 567</strong><br>— OR — Airtel Money: <strong id="airtel-number">0751 234 567</strong></div>
+      <div class="pay-step">2. Note the <strong>transaction reference</strong> you receive via SMS</div>
+      <div class="pay-step">3. Fill in the form below and submit — we activate you within <strong>1 hour</strong></div>
+    </div>
+
+    <div class="alert alert-err" id="pay-err"></div>
+    <div class="alert alert-ok" id="pay-ok"></div>
+
+    <div class="field"><label class="label">Your MoMo / Airtel Number</label><input class="input" id="pay-number" type="tel" placeholder="e.g. 0771234567"></div>
+    <div class="field"><label class="label">Your Name (as on MoMo)</label><input class="input" id="pay-name" type="text" placeholder="e.g. Nakato Sarah"></div>
+    <div class="field">
+      <label class="label">Network</label>
+      <select class="input" id="pay-network">
+        <option value="mtn">MTN MoMo</option>
+        <option value="airtel">Airtel Money</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">Plan</label>
+      <select class="input" id="pay-plan">
+        <option value="pro">Pro Monthly — 7,000 UGX</option>
+        <option value="pro3">3 Months — 18,000 UGX</option>
+      </select>
+    </div>
+    <div class="field"><label class="label">Transaction Reference (from SMS)</label><input class="input" id="pay-ref" type="text" placeholder="e.g. MPS241012345678"></div>
+    <button class="submit-btn" id="pay-btn" onclick="submitPayment()">Submit Payment Proof</button>
+  </div>
+
+</div>
+
+<script>
+let myEmail = '';
+let myPlan = 'free';
+let myStatus = 'pending';
+let waStatus = 'none';
+let qrPoller = null;
+const messages = [];
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const r = await fetch('/api/me');
+    const d = await r.json();
+    if (!d.ok) { window.location.href = '/'; return; }
+
+    myEmail = d.user.email;
+    myPlan = d.user.plan;
+    myStatus = d.user.status;
+    waStatus = d.socketStatus;
+
+    document.getElementById('user-email').textContent = myEmail;
+
+    const chip = document.getElementById('plan-chip');
+    chip.textContent = myPlan === 'pro' ? 'PRO' : 'FREE';
+    chip.className = 'plan-chip ' + (myPlan === 'pro' ? 'plan-pro' : 'plan-free');
+
+    // Update link
+    const linkUrl = `${window.location.origin}/dashboard`;
+    document.getElementById('link-url').textContent = linkUrl;
+    document.getElementById('link-card').style.display = 'block';
+
+    // Show payment status
+    await loadPaymentStatus();
+
+    // Update WA status display
+    updateStatusCard(waStatus, d.wa);
+
+    // If already connected, show chat
+    if (waStatus === 'connected') {
+      showChat();
+    }
+
+  } catch(e) {
+    console.error(e);
+    window.location.href = '/';
+  }
+}
+
+async function loadPaymentStatus() {
+  const r = await fetch('/api/payment/status');
+  const d = await r.json();
+  const area = document.getElementById('pay-status-area');
+
+  if (myStatus === 'active') {
+    document.getElementById('pay-card').style.display = 'none';
+    area.innerHTML = `<div class="pay-status-card pay-active"><div class="pay-status-icon">✅</div><div><strong>Account Active</strong><br>Your ${myPlan === 'pro3' ? '3-month' : 'monthly'} plan is running. Your WhatsApp session is kept alive 24/7.</div></div>`;
+    return;
+  }
+
+  if (d.payment?.status === 'pending') {
+    area.innerHTML = `<div class="pay-status-card pay-pending"><div class="pay-status-icon">⏳</div><div><strong>Payment Under Review</strong><br>We received your payment proof and will activate your account within 1 hour. Check back soon!</div></div>`;
+    document.getElementById('pay-card').style.display = 'none';
+  }
+}
+
+function updateStatusCard(status, waInfo) {
+  const num = document.getElementById('wa-number-display');
+  const stat = document.getElementById('wa-status-text');
+  const btn = document.getElementById('connect-btn');
+
+  if (status === 'connected') {
+    num.textContent = waInfo?.wa_number ? `+${waInfo.wa_number}` : 'Connected';
+    stat.innerHTML = '<span class="status-dot dot-green"></span>WhatsApp connected & running';
+    btn.textContent = 'Reconnect';
+  } else if (status === 'awaiting_scan') {
+    num.textContent = 'Scan QR to connect';
+    stat.innerHTML = '<span class="status-dot dot-gold"></span>Waiting for QR scan...';
+    btn.textContent = 'Waiting...'; btn.disabled = true;
+  } else {
+    num.textContent = myStatus === 'active' ? 'Tap Connect to start' : 'Activate account first';
+    stat.innerHTML = '<span class="status-dot dot-grey"></span>Not connected';
+    btn.textContent = 'Connect WhatsApp';
+    btn.disabled = myStatus !== 'active';
+  }
+}
+
+// ── WA CONNECT ────────────────────────────────────────────────────────────────
+async function startWA() {
+  if (myStatus !== 'active') {
+    document.getElementById('pay-card').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  document.getElementById('connect-btn').disabled = true;
+  document.getElementById('connect-btn').textContent = 'Starting...';
+
+  const r = await fetch('/api/wa/start', {method:'POST'});
+  const d = await r.json();
+  if (!d.ok) { alert(d.error); return; }
+
+  if (d.status === 'already_connected') { showChat(); return; }
+
+  document.getElementById('qr-card').style.display = 'block';
+  document.getElementById('qr-card').scrollIntoView({behavior:'smooth'});
+  pollQR();
+}
+
+function pollQR() {
+  if (qrPoller) clearInterval(qrPoller);
+  qrPoller = setInterval(async () => {
+    const r = await fetch('/api/wa/qr');
+    const d = await r.json();
+    waStatus = d.status;
+    updateStatusCard(d.status, null);
+
+    if (d.status === 'awaiting_scan' && d.qr) {
+      const box = document.getElementById('qr-box');
+      box.innerHTML = `<img src="${d.qr}" alt="WhatsApp QR Code" style="width:100%;height:100%;border-radius:12px">`;
+      document.getElementById('qr-hint').textContent = 'Scan now with WhatsApp → Linked Devices → Link a Device';
+    }
+
+    if (d.status === 'connected') {
+      clearInterval(qrPoller);
+      document.getElementById('qr-card').style.display = 'none';
+      document.getElementById('connect-btn').disabled = false;
+      showChat();
+    }
+
+    if (d.status === 'disconnected' || d.status === 'none') {
+      clearInterval(qrPoller);
+      document.getElementById('connect-btn').disabled = false;
+      document.getElementById('connect-btn').textContent = 'Connect WhatsApp';
+    }
+  }, 2500);
+}
+
+function showChat() {
+  document.getElementById('chat-card').style.display = 'block';
+  updateStatusCard('connected', null);
+  document.getElementById('connect-btn').textContent = 'Reconnect';
+  document.getElementById('connect-btn').disabled = false;
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+async function sendMsg() {
+  const to = document.getElementById('chat-to').value.trim().replace(/\s/g,'').replace(/^\+?256/,'256').replace(/^0/,'256');
+  const text = document.getElementById('msg-input').value.trim();
+  if (!to || !text) return;
+
+  // Optimistic UI
+  addMessage(text, 'out');
+  document.getElementById('msg-input').value = '';
+
+  try {
+    const r = await fetch('/api/wa/send', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,message:text})});
+    const d = await r.json();
+    if (!d.ok) addMessage('⚠️ Failed to send: ' + d.error, 'in');
+  } catch { addMessage('⚠️ Connection error', 'in'); }
+}
+
+function addMessage(text, dir) {
+  const area = document.getElementById('messages-area');
+  const empty = area.querySelector('.empty-chat');
+  if (empty) empty.remove();
+  const now = new Date().toLocaleTimeString('en-UG',{hour:'2-digit',minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = `msg-bubble msg-${dir}`;
+  div.innerHTML = `${text}<div class="msg-time">${now}</div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+// ── PAYMENT ───────────────────────────────────────────────────────────────────
+async function submitPayment() {
+  const number = document.getElementById('pay-number').value.trim();
+  const name = document.getElementById('pay-name').value.trim();
+  const network = document.getElementById('pay-network').value;
+  const plan = document.getElementById('pay-plan').value;
+  const ref = document.getElementById('pay-ref').value.trim();
+
+  if (!number || !name || !ref) {
+    showAlert('pay-err','Please fill in all fields'); return;
+  }
+
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  const r = await fetch('/api/payment/submit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({momo_number:number,momo_name:name,network,plan,ref})});
+  const d = await r.json();
+
+  if (d.ok) {
+    showAlert('pay-ok', '✅ Payment submitted! We will activate you within 1 hour. No need to resubmit.');
+    document.getElementById('pay-card').style.display = 'none';
+    document.getElementById('pay-status-area').innerHTML = `<div class="pay-status-card pay-pending"><div class="pay-status-icon">⏳</div><div><strong>Payment Under Review</strong><br>We received your proof and will activate within 1 hour. You can close this page.</div></div>`;
+  } else {
+    showAlert('pay-err', d.error || 'Error submitting');
+    btn.disabled = false; btn.textContent = 'Submit Payment Proof';
+  }
+}
+
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+  if (id.includes('err')) setTimeout(()=>el.style.display='none', 6000);
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function copyLink() {
+  const url = document.getElementById('link-url').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+
+async function doLogout() {
+  await fetch('/api/logout', {method:'POST'});
+  window.location.href = '/';
+}
+
+init();
+</script>
+</body>
+</html>
